@@ -40,6 +40,9 @@ type Index struct {
 	path string
 	name string
 
+	// version specifies what pilosa version the Index is at
+	version string
+
 	// Default time quantum for all frames in index.
 	// This can be overridden by individual frames.
 	timeQuantum TimeQuantum
@@ -142,6 +145,8 @@ func (i *Index) Open() error {
 		return err
 	}
 
+	// Might want to check meta version number here, against Pilosa version number and error or attempt to migrate
+
 	if err := i.openFrames(); err != nil {
 		return err
 	}
@@ -192,6 +197,7 @@ func (i *Index) loadMeta() error {
 	if os.IsNotExist(err) {
 		i.timeQuantum = ""
 		i.columnLabel = DefaultColumnLabel
+		i.version = Version
 		return nil
 	} else if err != nil {
 		return err
@@ -214,6 +220,7 @@ func (i *Index) saveMeta() error {
 	buf, err := proto.Marshal(&internal.IndexMeta{
 		TimeQuantum: string(i.timeQuantum),
 		ColumnLabel: i.columnLabel,
+		Version:     i.version,
 	})
 	if err != nil {
 		return err
