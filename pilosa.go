@@ -26,9 +26,10 @@ import (
 var (
 	ErrHostRequired = errors.New("host required")
 
-	ErrIndexRequired = errors.New("index required")
-	ErrIndexExists   = errors.New("index already exists")
-	ErrIndexNotFound = errors.New("index not found")
+	ErrIndexRequired        = errors.New("index required")
+	ErrIndexExists          = errors.New("index already exists")
+	ErrIndexNotFound        = errors.New("index not found")
+	ErrIndexVersionMismatch = errors.New("index version outdated")
 
 	// ErrFrameRequired is returned when no frame is specified.
 	ErrFrameRequired        = errors.New("frame required")

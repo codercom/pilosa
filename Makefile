@@ -3,7 +3,7 @@
 DEP := $(shell command -v dep 2>/dev/null)
 STATIK := $(shell command -v statik 2>/dev/null)
 PROTOC := $(shell command -v protoc 2>/dev/null)
-VERSION := $(shell git describe --tags 2> /dev/null || echo unknown)
+VERSION := $(shell git describe --abbrev=0 --tags 2> /dev/null || echo unknown)
 IDENTIFIER := $(VERSION)-$(GOOS)-$(GOARCH)
 CLONE_URL=github.com/pilosa/pilosa
 PKGS := $(shell cd $(GOPATH)/src/$(CLONE_URL); go list ./... | grep -v vendor)

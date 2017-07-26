@@ -286,3 +286,26 @@ func TestIndex_SetTimeQuantum(t *testing.T) {
 		t.Fatalf("unexpected quantum (reopen): %s", q)
 	}
 }
+
+// Ensure index errors on version mismatch
+func TestIndex_VersionMismatch(t *testing.T) {
+	orig := pilosa.Version
+	defer func() {
+		pilosa.Version = orig
+	}()
+
+	//should match version
+	pilosa.Version = "v0.4.0"
+	index := test.NewIndex()
+	if err := index.Open(); err != nil {
+		t.Fatalf("should not have version mismatch")
+	}
+
+	//version update
+	pilosa.Version = "v0.5.0"
+
+	if err := index.Reopen(); err != pilosa.ErrIndexVersionMismatch {
+		index.Close()
+		t.Fatalf("should fail on version mismatch %v", err)
+	}
+}

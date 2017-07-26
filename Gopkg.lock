@@ -24,6 +24,12 @@
   revision = "97c69685293dce4c0a2d0b19535179bbc976e4d2"
 
 [[projects]]
+  name = "github.com/blang/semver"
+  packages = ["."]
+  revision = "b38d23b8782a487059e8fc8773e9a5b228a77cb6"
+  version = "v3.5.0"
+
+[[projects]]
   name = "github.com/boltdb/bolt"
   packages = ["."]
   revision = "4b1ebc1869ad66568b313d0dc410e2be72670dda"
@@ -194,6 +200,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "84ff0992f3a6023a9d4832d6aea43d6aec19878a4b9e991ba8ff8269b589e816"
+  inputs-digest = "9def6c3baf0b4d59c8abdfd55d7333a05f79003d163436ca436d122431b53538"
   solver-name = "gps-cdcl"
   solver-version = 1
