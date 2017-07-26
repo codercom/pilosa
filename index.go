@@ -22,9 +22,11 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
+	"github.com/blang/semver"
 	"github.com/gogo/protobuf/proto"
 	"github.com/pilosa/pilosa/internal"
 )
@@ -133,6 +135,38 @@ func (i *Index) ColumnLabel() string {
 	return v
 }
 
+//Version returns the version of pilosa that the index is up to date with
+func (i *Index) Version() string {
+	return i.version
+}
+
+// CheckVersion checks the index version against the pilosa build version
+// and returns ErrIndexVersionMismatch if less than build version
+func (i *Index) CheckVersion() error {
+	is, ps := i.version, Version
+
+	var iver, pver semver.Version
+	var err error
+
+	if strings.HasPrefix(is, "v") {
+		is = is[1:]
+	}
+	if strings.HasPrefix(ps, "v") {
+		ps = ps[1:]
+	}
+
+	if iver, err = semver.Make(is); err != nil {
+		return err
+	}
+	if pver, err = semver.Make(ps); err != nil {
+		return err
+	}
+	if !iver.EQ(pver) {
+		return ErrIndexVersionMismatch
+	}
+	return nil
+}
+
 // Open opens and initializes the index.
 func (i *Index) Open() error {
 	// Ensure the path exists.
@@ -145,7 +179,9 @@ func (i *Index) Open() error {
 		return err
 	}
 
-	// Might want to check meta version number here, against Pilosa version number and error or attempt to migrate
+	if err := i.CheckVersion(); err != nil {
+		return err
+	}
 
 	if err := i.openFrames(); err != nil {
 		return err
@@ -198,7 +234,7 @@ func (i *Index) loadMeta() error {
 		i.timeQuantum = ""
 		i.columnLabel = DefaultColumnLabel
 		i.version = Version
-		return nil
+		return i.saveMeta()
 	} else if err != nil {
 		return err
 	} else {
@@ -210,6 +246,7 @@ func (i *Index) loadMeta() error {
 	// Copy metadata fields.
 	i.timeQuantum = TimeQuantum(pb.TimeQuantum)
 	i.columnLabel = pb.ColumnLabel
+	i.version = pb.Version
 
 	return nil
 }
